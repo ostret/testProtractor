@@ -2,12 +2,26 @@
 exports.config = {
     seleniumAddress: 'http://localhost:4444/wd/hub',
     specs: ['specs/test.js'],
-    capabilities: {
-        'browserName': 'chrome',
+    multiCapabilities: [{
+        browserName: 'chrome',
         chromeOptions: {
-            args: [  "--disable-gpu", "--window-size=800,600" ]
+            args: ["--disable-gpu", "--window-size=1600,800"],
+            prefs: {
+                autofill: {
+                    auxiliary_profiles_enabled: false,
+                    enabled: false
+                }
+            }
         }
     },
+        {
+            'browserName': 'firefox',
+            'moz:firefoxOptions': {
+                'args': ['--safe-mode']
+            }
+        }
+
+    ],
     framework:'jasmine',
     jasmineNodeOpts: {
         showColors: true,   // Use colors in the command line report.
@@ -18,5 +32,9 @@ exports.config = {
         browser.ignoreSynchronization = true;
         require("babel-register");
         require("babel-core/register")({presets: ["es2015"]});
+    },
+    params: {
+        baseURL: 'http://demo.redmine.org/',
+        baseTimeout: 3000
     }
 };

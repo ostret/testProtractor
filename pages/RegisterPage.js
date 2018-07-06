@@ -1,8 +1,12 @@
-import regDefaults from "../repository/userData"
+import basePage from "./basePage";
+import MyAccountPage from "./MyAccountPage";
 
-class RegisterPage{
+class RegisterPage extends basePage {
 
     constructor(){
+        super();
+        this.loadedIndicator = element(by.css("#content h2"));
+
         this.loginInput = element(by.id("user_login"));
         this.passwordInput = element(by.id("user_password"));
         this.passwordConfirmationInput = element(by.id("user_password_confirmation"));
@@ -12,18 +16,22 @@ class RegisterPage{
         this.submitBtn = element(by.name("commit"));
     }
 
-     fillInRegisterPage(){
-        let epoch = (new Date).getTime();
-         console.log(epoch.toString());
+    fillInRegisterPage(login, password, confPassword, firstName, lastName, email) {
+        this.loginInput.clear().sendKeys(login);
+        this.passwordInput.clear().sendKeys(password);
+        this.passwordConfirmationInput.clear().sendKeys(confPassword);
+        this.firstNameInput.clear().sendKeys(firstName);
+        this.lasttNameInput.clear().sendKeys(lastName);
+        this.emailInput.clear().sendKeys(email);
+        return this;
 
-         this.loginInput.sendKeys(regDefaults.registerData.login + epoch.toString());
-         this.passwordInput.sendKeys(regDefaults.registerData.password + epoch.toString());
-         this.passwordConfirmationInput.sendKeys(regDefaults.registerData.password + epoch.toString());
-         this.firstNameInput.sendKeys(regDefaults.registerData.firstName);
-         this.lasttNameInput.sendKeys(regDefaults.registerData.lastName);
-         this.emailInput.sendKeys(epoch.toString() + regDefaults.registerData.email);
-         this.submitBtn.click();
-        return epoch;
     }
+
+    submitData() {
+        this.submitBtn.click();
+        return MyAccountPage;
+
+    }
+
 }
 export default new RegisterPage();

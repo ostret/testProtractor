@@ -1,11 +1,11 @@
-export default class basePage{
-    constructor(){
+export default class basePage {
+    constructor() {
 
         this.topMenu = element(by.id('top-menu'));
         this.loggedInUserLink = this.topMenu.element(by.id('loggedas'));
         this.loggedInUserText = this.loggedInUserLink.element(by.className("user"));
         this.registerLink = this.topMenu.element(by.className('register'));
-        this.logOutLink = this.topMenu.element(by.className('loggout'));
+        this.logOutLink = this.topMenu.element(by.className('logout'));
         this.signInLink = this.topMenu.element(by.className('login'));
         this.homeLink = this.topMenu.element(by.className('home'));
         this.projectsLink = this.topMenu.element(by.className('projects'));
@@ -16,26 +16,30 @@ export default class basePage{
 
     ifLoggedInCleanUp() {
         this.loggedInUserLink.isPresent().then(function (result) {
-            if (result){
+            if (result) {
                 this.logOutLink.click();
             }
-            else
-            {console.log("user was not logged in")}
+            else {
+                console.log("user was not logged in")
+            }
         });
 
     }
 
-    isLoaded(){
+    isLoaded() {
         return protractor.ExpectedConditions.visibilityOf(this.loadedIndicator);
     }
-    isLoadedLocator(locator){
+
+
+    isLoadedLocator(locator) {
         return protractor.ExpectedConditions.visibilityOf(locator);
     }
-    isClosed(locator){
+
+    isClosed(locator) {
         return protractor.ExpectedConditions.stalenessOf(locator);
     }
 
-    isInvisible(locator){
+    isInvisible(locator) {
         return protractor.ExpectedConditions.invisibilityOf(locator);
     }
 

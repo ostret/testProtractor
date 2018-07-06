@@ -1,21 +1,22 @@
-class RootPage {
+import basePage from './basePage';
+import SignInPage from "./SignInPage";
+import ProjectsPage from "./ProjectsPage";
+
+class RootPage extends basePage {
     constructor(){
-        this.loggedInUserLink = element(by.id('loggedas'));
-        this.registerLink = element(by.className('register'));
-        this.logOutLink = element(by.className('loggout'))
+        super();
+        this.loadedIndicator = element(by.css('#header h1'));
     }
 
-    ifLoggedInCleanUp() {
-        this.loggedInUserLink.isPresent().then(function (result) {
-            if (result){
-                return this.logOutLink.click();
-            }
-            else
-            {console.log("user was not logged in")}
-        });
-
+    signIn() {
+        this.signInLink.click();
+        return SignInPage;
     }
-    
+
+    openProjects() {
+        this.projectsLink.click();
+        return ProjectsPage;
+    }
 
 }
 export default new RootPage();
