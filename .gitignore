@@ -1,6 +1,9 @@
 /.idea
 package-lock.json
 
+target/
+allure-results/
+
 # Logs
 logs
 *.log

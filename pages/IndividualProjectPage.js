@@ -1,4 +1,5 @@
 import basePage from "./basePage";
+import titles from '../repository/titles';
 
 class IndividualProjectPage extends basePage {
     constructor() {
@@ -18,23 +19,33 @@ class IndividualProjectPage extends basePage {
         this.contentMembersNewLink = this.contentMembers.element(by.css('a[href$="/memberships/new"]'));
 
         this.newMemberModal = element(by.id('new_membership'));
-        this.newMemberModalSearch = this.newMemberModal.element(by.name('principal_search'));
+        this.newMemberModalSearch = this.newMemberModal.element(by.id('principal_search'));
         this.newMemberModalList = this.newMemberModal.element(by.id('principals'));
         this.newMemberModalSubmitBtn = this.newMemberModal.element(by.id('member-add-submit'));
 
         this.newMemberModalRoleSelection = this.newMemberModal.element(by.className('roles-selection'));
 
         this.message = element(by.id('flash_notice'));
-
+        this.warningNotice = element(by.xpath('//p[@class="warning"]//span[@class="icon icon-lock"]'));
+        this.closeIcon = element(by.className('icon-lock'));
     }
 
     searchUserByFullName(firstname, lastname) {
         this.newMemberModalSearch.sendKeys(firstname + " " + lastname);
-        browser.driver.sleep(3000);
+        // this search input is terrible, it does not have text, have to wait for attribute to change value
+        browser.wait(this.isLoadedLocator($('#principal_search[data-value-was="' + firstname + " " + lastname + '"]')),
+            browser.params.baseTimeout);
+        browser.sleep(1000);
     }
 
-    selectFirstResult() {
-        this.newMemberModalList.all(by.name('membership[user_ids][]')).get(0).click();
+    selectFirstResult(firstname, lastname) {
+        let xpath = '//label[contains(text(),"' + firstname + " " + lastname +
+            '")]//input';
+
+        this.newMemberModalList.element(by.xpath(xpath)).click();
+        // browser.wait(this.isSelected(this.newMemberModalList.element(by.xpath(xpath))),
+        //     browser.params.baseTimeout );
+
     }
 
     selectRoleByValue(value) {
@@ -43,7 +54,7 @@ class IndividualProjectPage extends basePage {
 
     addMember(firstname, lastname, role) {
         this.searchUserByFullName(firstname, lastname);
-        this.selectFirstResult();
+        this.selectFirstResult(firstname, lastname);
         this.selectRoleByValue(role);
         this.newMemberModalSubmitBtn.click();
     }
@@ -61,6 +72,11 @@ class IndividualProjectPage extends basePage {
         return element(by.xpath(xpath)).isPresent();
     }
 
+    closeProject() {
+        this.closeIcon.click();
+        browser.switchTo().alert().accept();
+        expect(this.warningNotice.getText()).toBe(titles.message.successCloseProject);
+    }
 
 }
 

@@ -9,11 +9,15 @@ import newIssueData from "../repository/newIssueData";
 import titles from "../repository/titles";
 import userData from "../repository/userData";
 import MyAccountPage from "../pages/MyAccountPage";
+import basePage from "../pages/basePage";
+import ConfirmationPage from "../pages/ConfirmationPage";
 
 let epoch = (new Date()).getTime(); // use it as a unique identifier for user
 
+
 describe('redmine demo test suite', function () {
     beforeAll(() => {
+
         browser.waitForAngularEnabled(false);
         browser.get(browser.params.baseURL);
 
@@ -106,13 +110,17 @@ describe('redmine demo test suite', function () {
 
 
     it('should close project', function () {
-        IndividualProjectPage.menuOverview.click();
+        RootPage.openProjects()
+            .findProjectAndOpen(projectData.projectData.name + epoch.toString())
+            .menuOverview.click();
         browser.wait(IndividualProjectPage.isLoaded(), browser.params.baseTimeout);
         expect(IndividualProjectPage.loadedIndicator.getText()).toBe(titles.title.overview);
+        IndividualProjectPage.closeProject();
 
     });
     it('should delete account', function () {
-
+        expect(RootPage.openMyAccount().deleteMyAccount().loadedIndicator.getText()).toBe(titles.title.confirmation);
+        expect(RootPage.isInvisible(ConfirmationPage.deleteAccount().loggedInUserText)).toBeTruthy();
 
     });
 
