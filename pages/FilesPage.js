@@ -23,7 +23,6 @@ class FilesPage extends basePage {
             + '")]//parent::td//parent::tr//td[@class="buttons"]//a[@data-method="delete"]')).click();
 
         browser.switchTo().alert().accept();
-        browser.pause();
         return this;
 
     }

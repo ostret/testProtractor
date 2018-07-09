@@ -45,7 +45,6 @@ class NewIssuePage extends basePage {
         browser.wait(protractor.ExpectedConditions.presenceOf(element(by.name('attachments[1][token]'))),
             browser.params.baseTimeout);
 
-        // browser.sleep(1000);
         this.createBtn.click();
         return IndividualIssuePage;
 
