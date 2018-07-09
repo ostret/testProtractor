@@ -2,6 +2,7 @@ import basePage from './basePage';
 import SignInPage from "./SignInPage";
 import ProjectsPage from "./ProjectsPage";
 import MyAccountPage from "./MyAccountPage";
+import RegisterPage from "./RegisterPage";
 
 class RootPage extends basePage {
     constructor(){
@@ -24,6 +25,12 @@ class RootPage extends basePage {
         this.myAccountLink.click();
         return MyAccountPage;
     }
+
+    openRegisterPage() {
+        this.registerLink.click();
+        return RegisterPage;
+    }
+
 
 }
 export default new RootPage();

@@ -43,5 +43,9 @@ export default class basePage {
         return protractor.ExpectedConditions.invisibilityOf(locator);
     }
 
+    logout() {
+        this.logOutLink.click();
+        return this;
+    }
 
 }

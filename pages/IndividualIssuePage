@@ -1,0 +1,18 @@
+import basePage from "./basePage";
+import IssuesPage from "./IssuesPage";
+
+class IndividualIssuePage extends basePage {
+    constructor() {
+        super();
+        this.message = element(by.id('flash_notice'));
+        this.deleteLink = $$('.icon-del').get(0);
+    }
+
+    deleteCurrentIssue() {
+        this.deleteLink.click();
+        browser.switchTo().alert().accept();
+        return IssuesPage;
+    }
+}
+
+export default new IndividualIssuePage();

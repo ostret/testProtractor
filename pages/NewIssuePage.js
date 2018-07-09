@@ -1,4 +1,5 @@
 import basePage from "./basePage";
+import IndividualIssuePage from "./IndividualIssuePage";
 
 class NewIssuePage extends basePage {
 
@@ -13,7 +14,7 @@ class NewIssuePage extends basePage {
 
         this.loadedIndicator = element(by.css("#content h2"));
 
-        this.message = element(by.id('flash_notice'));
+
 
     }
 
@@ -24,6 +25,7 @@ class NewIssuePage extends basePage {
         this.statusInput.element(by.cssContainingText('option', status)).click();
         this.priorityInput.element(by.cssContainingText('option', priority)).click();
         this.createBtn.click();
+        return IndividualIssuePage;
 
     }
 

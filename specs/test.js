@@ -9,8 +9,13 @@ import newIssueData from "../repository/newIssueData";
 import titles from "../repository/titles";
 import userData from "../repository/userData";
 import MyAccountPage from "../pages/MyAccountPage";
-import basePage from "../pages/basePage";
 import ConfirmationPage from "../pages/ConfirmationPage";
+import IndividualIssuePage from "../pages/IndividualIssuePage";
+import basePage from "../pages/basePage";
+
+import * as path from 'path';
+import fileData from "../repository/fileData";
+import FilesPage from "../pages/FilesPage";
 
 let epoch = (new Date()).getTime(); // use it as a unique identifier for user
 
@@ -32,9 +37,8 @@ describe('redmine demo test suite', function () {
         expect(RootPage.isLoaded()).toBeTruthy();
 
         //go and register a new user with default dto
-        RootPage.registerLink.click();
 
-        expect(registerPage.loadedIndicator.getText()).toBe(titles.title.register);
+        expect(RootPage.openRegisterPage().loadedIndicator.getText()).toBe(titles.title.register);
 
         //validate registration
         expect(registerPage
@@ -46,8 +50,9 @@ describe('redmine demo test suite', function () {
                 epoch.toString() + regDefaults.registerData.email)
             .submitData().message.getText()).toMatch(titles.message.successSignUp);
 
-        //registerPage.homeLink.click();
-        MyAccountPage.logOutLink.click();
+        //  log out
+        expect(MyAccountPage.logout().loggedInUserText.isPresent()).toBeFalsy();
+
 
         // login with new user and check name in header
         expect(RootPage
@@ -73,49 +78,98 @@ describe('redmine demo test suite', function () {
         ).toMatch(titles.message.successProjectCreate);
 
 
-        IndividualProjectPage.menuSettingsTabsMembers.click();
-        browser.wait(IndividualProjectPage.isLoadedLocator(IndividualProjectPage.contentMembersNewLink),
+        //IndividualProjectPage.menuSettingsTabsMembers.click();
+        // add new member
+        browser.wait(IndividualProjectPage
+                .openSettingsMembersTab()
+                .isLoadedLocator(IndividualProjectPage.contentMembersNewLink),
             browser.params.baseTimeout);
+
+        //if user is already added - skip it
+
         IndividualProjectPage.isPresentMember(userData.testUser.firstname, userData.testUser.lastname)
             .then(function (result) {
                 if (result) {
                     console.log('user is already here');
                 }
+                // otherwise find and add
                 else {
-                    IndividualProjectPage.contentMembersNewLink.click();
-                    browser.wait(IndividualProjectPage.isLoadedLocator(IndividualProjectPage.newMemberModal),
+
+                    browser.wait(IndividualProjectPage.isLoadedLocator(IndividualProjectPage.openNewMemberModal().newMemberModal),
                         browser.params.baseTimeout);
-                    IndividualProjectPage.addMember(userData.testUser.firstname, userData.testUser.lastname, 1);
+                    IndividualProjectPage.addMember(userData.testUser.firstname,
+                        userData.testUser.lastname, userData.roleType.DEVELOPER.value);
                     browser.wait(IndividualProjectPage.isInvisible(IndividualProjectPage.newMemberModal),
                         browser.params.baseTimeout);
                     IndividualProjectPage.removeMember(userData.testUser.firstname, userData.testUser.lastname);
+
                 }
             });
 
-        IndividualProjectPage.menuNewIssue.click();
-
-        browser.wait(NewIssuePage.isLoaded(), browser.params.baseTimeout);
+        // add new issue
+        browser.wait(IndividualProjectPage.openNewIssue().isLoaded(), browser.params.baseTimeout);
         expect(NewIssuePage.loadedIndicator.getText()).toBe(titles.title.newIssue);
-        NewIssuePage.fillInNewIssue(
-            newIssueData.newIssue.trackerType, newIssueData.newIssue.subject + epoch.toString(),
-            newIssueData.newIssue.description,
-            newIssueData.newIssue.status, newIssueData.newIssue.priority
-        );
-        expect(NewIssuePage.message.getText()).toMatch(/Issue #\d+ created./);
-        $$('.icon-del').get(0).click();
-        browser.switchTo().alert().accept();
+        expect(
+            NewIssuePage.fillInNewIssue(
+                newIssueData.newIssue.trackerType, newIssueData.newIssue.subject + epoch.toString(),
+                newIssueData.newIssue.description,
+                newIssueData.newIssue.status, newIssueData.newIssue.priority)
+                .message.getText()).toMatch(/Issue #\d+ created./);
 
+
+    });
+    it('should add file to project', function () {
+        expect(
+            RootPage.openProjects()
+                .findProjectAndOpen(projectData.projectData.name + epoch.toString())
+                .openFilesTab()
+                .openAddNewFilePage()
+                .addNewFile(path.resolve(__dirname, fileData.fileData.relPath))
+                .lookUpFileByName(fileData.fileData.fileName).isPresent())
+            .toBeTruthy();
+
+    });
+
+    it('should remove file from project', function () {
+        RootPage
+            .openProjects()
+            .findProjectAndOpen(projectData.projectData.name + epoch.toString())
+            .openFilesTab().lookUpFileByName(projectData.projectData.name).isPresent()
+            .then(function (result) {
+                if (result) {
+                    expect(FilesPage
+                        .removeFileByName(fileData.fileData.fileName)
+                        .lookUpFileByName(fileData.fileData.fileName).isPresent())
+                        .toBeFalsy();
+                }
+                else {
+                    pending('there was no file to delete'); // there's a bug that will mark it failed though
+                }
+            });
 
     });
 
 
+    it('should remove issue', function () {
+
+        expect(
+            RootPage.openProjects()
+                .findProjectAndOpen(projectData.projectData.name + epoch.toString())
+                .openIssues()
+                .openIssueBySbjct(newIssueData.newIssue.subject + epoch.toString())
+                .deleteCurrentIssue()
+                .noDataMsg.getText()
+        ).toBe(titles.message.noDataForIssues);
+    });
+
+
     it('should close project', function () {
-        RootPage.openProjects()
+        browser.wait(RootPage.openProjects()
             .findProjectAndOpen(projectData.projectData.name + epoch.toString())
-            .menuOverview.click();
-        browser.wait(IndividualProjectPage.isLoaded(), browser.params.baseTimeout);
+            .openOverviewTab().isLoaded(), browser.params.baseTimeout);
         expect(IndividualProjectPage.loadedIndicator.getText()).toBe(titles.title.overview);
-        IndividualProjectPage.closeProject();
+        expect(IndividualProjectPage.closeProject().warningNotice.getText()).toBe(titles.message.successCloseProject);
+
 
     });
     it('should delete account', function () {
@@ -123,5 +177,4 @@ describe('redmine demo test suite', function () {
         expect(RootPage.isInvisible(ConfirmationPage.deleteAccount().loggedInUserText)).toBeTruthy();
 
     });
-
 });

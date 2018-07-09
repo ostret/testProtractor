@@ -1,5 +1,8 @@
 import basePage from "./basePage";
 import titles from '../repository/titles';
+import IssuesPage from "./IssuesPage";
+import NewIssuePage from "./NewIssuePage";
+import FilesPage from "./FilesPage";
 
 class IndividualProjectPage extends basePage {
     constructor() {
@@ -9,8 +12,11 @@ class IndividualProjectPage extends basePage {
 
         this.mainMenu = element(by.id('main-menu'));
         this.menuSettings = this.mainMenu.element(by.className('settings'));
+        this.menuIssues = this.mainMenu.element(by.className('issues '));
         this.menuNewIssue = this.mainMenu.element(by.className('new-issue'));
         this.menuOverview = this.mainMenu.element(by.className('overview'));
+        this.menuFiles = this.mainMenu.element(by.className('files'));
+
 
         this.menuSettingsTabs = element(by.className('tabs'));
         this.menuSettingsTabsMembers = this.menuSettingsTabs.element(by.id('tab-members'));
@@ -35,13 +41,13 @@ class IndividualProjectPage extends basePage {
         // this search input is terrible, it does not have text, have to wait for attribute to change value
         browser.wait(this.isLoadedLocator($('#principal_search[data-value-was="' + firstname + " " + lastname + '"]')),
             browser.params.baseTimeout);
-        browser.sleep(1000);
+
     }
 
     selectFirstResult(firstname, lastname) {
         let xpath = '//label[contains(text(),"' + firstname + " " + lastname +
             '")]//input';
-
+        browser.wait(this.isLoadedLocator(this.newMemberModalList.element(by.xpath(xpath))), browser.params.baseTimeout);
         this.newMemberModalList.element(by.xpath(xpath)).click();
         // browser.wait(this.isSelected(this.newMemberModalList.element(by.xpath(xpath))),
         //     browser.params.baseTimeout );
@@ -75,8 +81,42 @@ class IndividualProjectPage extends basePage {
     closeProject() {
         this.closeIcon.click();
         browser.switchTo().alert().accept();
-        expect(this.warningNotice.getText()).toBe(titles.message.successCloseProject);
+        return this;
+
     }
+
+    openIssues() {
+        this.menuIssues.click();
+        return IssuesPage;
+    }
+
+    openFilesTab() {
+        this.menuFiles.click();
+        return FilesPage;
+
+    }
+
+    openNewIssue() {
+        this.menuNewIssue.click();
+        return NewIssuePage;
+    }
+
+    openSettingsMembersTab() {
+        this.menuSettingsTabsMembers.click();
+        return this;
+    }
+
+    openOverviewTab() {
+        this.menuOverview.click();
+        return this;
+    }
+
+    openNewMemberModal() {
+        this.contentMembersNewLink.click();
+        return this;
+    }
+
+
 
 }
 
