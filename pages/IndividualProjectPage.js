@@ -1,5 +1,4 @@
 import basePage from "./basePage";
-import titles from '../repository/titles';
 import IssuesPage from "./IssuesPage";
 import NewIssuePage from "./NewIssuePage";
 import FilesPage from "./FilesPage";
@@ -63,12 +62,14 @@ class IndividualProjectPage extends basePage {
         this.selectFirstResult(firstname, lastname);
         this.selectRoleByValue(role);
         this.newMemberModalSubmitBtn.click();
+        return this;
     }
 
     removeMember(firstname, lastname) {
         let xpath = '//a[contains(text(),"' + firstname + " " + lastname +
             '")]/parent::td/parent::tr/td[contains(@class, "buttons")]/a[contains(@class,"icon-del")]';
         element(by.xpath(xpath)).click();
+        return this;
 
     }
 
@@ -116,6 +117,9 @@ class IndividualProjectPage extends basePage {
         return this;
     }
 
+    lookUpMemberByName(firstname, lastname) {
+        return element(by.xpath('//a[contains(text(),"' + firstname + " " + lastname + '")]'));
+    }
 
 
 }

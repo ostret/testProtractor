@@ -10,8 +10,7 @@ import titles from "../repository/titles";
 import userData from "../repository/userData";
 import MyAccountPage from "../pages/MyAccountPage";
 import ConfirmationPage from "../pages/ConfirmationPage";
-import IndividualIssuePage from "../pages/IndividualIssuePage";
-import basePage from "../pages/basePage";
+
 
 import * as path from 'path';
 import fileData from "../repository/fileData";
@@ -87,7 +86,7 @@ describe('redmine demo test suite', function () {
 
         //if user is already added - skip it
 
-        IndividualProjectPage.isPresentMember(userData.testUser.firstname, userData.testUser.lastname)
+        IndividualProjectPage.lookUpMemberByName(userData.testUser.firstname, userData.testUser.lastname).isPresent()
             .then(function (result) {
                 if (result) {
                     console.log('user is already here');
@@ -97,11 +96,14 @@ describe('redmine demo test suite', function () {
 
                     browser.wait(IndividualProjectPage.isLoadedLocator(IndividualProjectPage.openNewMemberModal().newMemberModal),
                         browser.params.baseTimeout);
-                    IndividualProjectPage.addMember(userData.testUser.firstname,
-                        userData.testUser.lastname, userData.roleType.DEVELOPER.value);
+                    browser.wait(IndividualProjectPage.addMember(userData.testUser.firstname,
+                        userData.testUser.lastname, userData.roleType.DEVELOPER.value)
+                            .lookUpMemberByName(userData.testUser.firstname, userData.testUser.lastname).isPresent()
+                        , browser.params.baseTimeout);
                     browser.wait(IndividualProjectPage.isInvisible(IndividualProjectPage.newMemberModal),
                         browser.params.baseTimeout);
-                    IndividualProjectPage.removeMember(userData.testUser.firstname, userData.testUser.lastname);
+                    browser.wait(protractor.ExpectedConditions.invisibilityOf(IndividualProjectPage.removeMember(userData.testUser.firstname, userData.testUser.lastname)
+                        .lookUpMemberByName(userData.testUser.firstname, userData.testUser.lastname)), browser.params.baseTimeout);
 
                 }
             });
@@ -134,7 +136,7 @@ describe('redmine demo test suite', function () {
         RootPage
             .openProjects()
             .findProjectAndOpen(projectData.projectData.name + epoch.toString())
-            .openFilesTab().lookUpFileByName(projectData.projectData.name).isPresent()
+            .openFilesTab().lookUpFileByName(fileData.fileData.fileName).isPresent()
             .then(function (result) {
                 if (result) {
                     expect(FilesPage
