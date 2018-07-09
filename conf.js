@@ -4,26 +4,27 @@ var AllureReporter = require('jasmine-allure-reporter');
 exports.config = {
     seleniumAddress: 'http://localhost:4444/wd/hub',
     specs: ['specs/test.js'],
-    multiCapabilities: [{
-        browserName: 'chrome',
-        chromeOptions: {
-            args: ["--disable-gpu", "--window-size=1600,800"],
-            prefs: {
-                autofill: {
-                    auxiliary_profiles_enabled: false,
-                    enabled: false
+    multiCapabilities: [
+        {
+            browserName: 'chrome',
+            chromeOptions: {
+                args: ["--disable-gpu", "--window-size=1600,800"],
+                prefs: {
+                    autofill: {
+                        auxiliary_profiles_enabled: false,
+                        enabled: false
+                    }
                 }
             }
         }
-    }
-        /*,
-            {
-                'browserName': 'firefox',
-                'moz:firefoxOptions': {
-                    'args': ['--safe-mode']
-                }
+        ,
+        {
+            'browserName': 'firefox',
+            'moz:firefoxOptions': {
+                'args': ['--safe-mode']
             }
-            */
+        }
+
 
     ],
     framework: 'jasmine2',
@@ -52,6 +53,6 @@ exports.config = {
     },
     params: {
         baseURL: 'http://demo.redmine.org/',
-        baseTimeout: 3000
+        baseTimeout: 5000
     }
 };

@@ -6,6 +6,12 @@ class IndividualIssuePage extends basePage {
         super();
         this.message = element(by.id('flash_notice'));
         this.deleteLink = $$('.icon-del').get(0);
+
+        this.statusValue = element(by.xpath('//td[@class="status"]'));
+        this.priorityValue = element(by.xpath('//td[@class="priority"]'));
+        this.assigneeLink = element(by.xpath('//td[@class="assigned-to"]//a'));
+        this.attachementLink = element(by.className('icon-attachment'));
+
     }
 
     deleteCurrentIssue() {

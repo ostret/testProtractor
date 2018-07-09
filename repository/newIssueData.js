@@ -23,6 +23,7 @@ export const priorityType = {
 export default {
     newIssue: {
         trackerType: trackerType.BUG.description, subject: "Subject", description: "desc",
-        status: statusType.NEW.description, priority: priorityType.IMMEDIATE.description
+        status: statusType.NEW.description, priority: priorityType.IMMEDIATE.description,
+        assignee: "<< me >>", dueDateOffset: 7, donePercentage: '90 %'
     }
 }

@@ -21,7 +21,9 @@ class FilesPage extends basePage {
     removeFileByName(name) {
         element(by.xpath('//a[contains(text(),"' + name
             + '")]//parent::td//parent::tr//td[@class="buttons"]//a[@data-method="delete"]')).click();
+
         browser.switchTo().alert().accept();
+        browser.pause();
         return this;
 
     }

@@ -15,6 +15,8 @@ import ConfirmationPage from "../pages/ConfirmationPage";
 import * as path from 'path';
 import fileData from "../repository/fileData";
 import FilesPage from "../pages/FilesPage";
+import IndividualIssuePage from "../pages/IndividualIssuePage";
+import IssuesPage from "../pages/IssuesPage";
 
 let epoch = (new Date()).getTime(); // use it as a unique identifier for user
 
@@ -111,13 +113,24 @@ describe('redmine demo test suite', function () {
         // add new issue
         browser.wait(IndividualProjectPage.openNewIssue().isLoaded(), browser.params.baseTimeout);
         expect(NewIssuePage.loadedIndicator.getText()).toBe(titles.title.newIssue);
+        var result = new Date();
+        result.setDate(result.getDate() + newIssueData.newIssue.dueDateOffset);
+
         expect(
             NewIssuePage.fillInNewIssue(
                 newIssueData.newIssue.trackerType, newIssueData.newIssue.subject + epoch.toString(),
                 newIssueData.newIssue.description,
-                newIssueData.newIssue.status, newIssueData.newIssue.priority)
+                newIssueData.newIssue.status, newIssueData.newIssue.priority, newIssueData.newIssue.assignee,
+                (new Date()).toISOString().slice(0, 10),
+                result.toISOString().slice(0, 10), newIssueData.newIssue.donePercentage,
+                path.resolve(__dirname, fileData.fileData.relPath))
                 .message.getText()).toMatch(/Issue #\d+ created./);
 
+        expect(IndividualIssuePage.statusValue.getText()).toBe(newIssueData.newIssue.status);
+        expect(IndividualIssuePage.priorityValue.getText()).toBe(newIssueData.newIssue.priority);
+        expect(IndividualIssuePage.assigneeLink.getText()).toBe(regDefaults.registerData.firstName + epoch.toString()
+            + " " + regDefaults.registerData.lastName + epoch.toString());
+        expect(IndividualIssuePage.attachementLink.getText()).toBe(fileData.fileData.fileName);
 
     });
     it('should add file to project', function () {
@@ -139,10 +152,10 @@ describe('redmine demo test suite', function () {
             .openFilesTab().lookUpFileByName(fileData.fileData.fileName).isPresent()
             .then(function (result) {
                 if (result) {
-                    expect(FilesPage
-                        .removeFileByName(fileData.fileData.fileName)
-                        .lookUpFileByName(fileData.fileData.fileName).isPresent())
-                        .toBeFalsy();
+                    browser.wait(protractor.ExpectedConditions.invisibilityOf(FilesPage
+                            .removeFileByName(fileData.fileData.fileName)
+                            .lookUpFileByName(fileData.fileData.fileName))
+                        , browser.params.baseTimeout);
                 }
                 else {
                     pending('there was no file to delete'); // there's a bug that will mark it failed though
@@ -154,14 +167,14 @@ describe('redmine demo test suite', function () {
 
     it('should remove issue', function () {
 
-        expect(
+        browser.wait(RootPage.isLoadedLocator(
             RootPage.openProjects()
                 .findProjectAndOpen(projectData.projectData.name + epoch.toString())
                 .openIssues()
                 .openIssueBySbjct(newIssueData.newIssue.subject + epoch.toString())
                 .deleteCurrentIssue()
-                .noDataMsg.getText()
-        ).toBe(titles.message.noDataForIssues);
+                .noDataMsg), browser.params.baseTimeout);
+        expect(IssuesPage.noDataMsg.getText()).toBe(titles.message.noDataForIssues);
     });
 
 
@@ -170,7 +183,9 @@ describe('redmine demo test suite', function () {
             .findProjectAndOpen(projectData.projectData.name + epoch.toString())
             .openOverviewTab().isLoaded(), browser.params.baseTimeout);
         expect(IndividualProjectPage.loadedIndicator.getText()).toBe(titles.title.overview);
-        expect(IndividualProjectPage.closeProject().warningNotice.getText()).toBe(titles.message.successCloseProject);
+        browser.wait(protractor.ExpectedConditions.presenceOf(
+            IndividualProjectPage.closeProject().warningNotice), browser.params.baseTimeout);
+        expect(IndividualProjectPage.warningNotice.getText()).toBe(titles.message.successCloseProject);
 
 
     });
