@@ -19,6 +19,8 @@ import IndividualIssuePage from "../pages/IndividualIssuePage";
 import IssuesPage from "../pages/IssuesPage";
 
 let epoch = (new Date()).getTime(); // use it as a unique identifier for user
+let filePath = (browser.params.dockerMode) ? fileData.fileDataDocker.relPath : path.resolve(__dirname, fileData.fileData.relPath);
+let fileName = (browser.params.dockerMode) ? fileData.fileDataDocker.fileName : fileData.fileData.fileName;
 
 
 describe('redmine demo test suite', function () {
@@ -123,14 +125,14 @@ describe('redmine demo test suite', function () {
                 newIssueData.newIssue.status, newIssueData.newIssue.priority, newIssueData.newIssue.assignee,
                 (new Date()).toISOString().slice(0, 10),
                 result.toISOString().slice(0, 10), newIssueData.newIssue.donePercentage,
-                path.resolve(__dirname, fileData.fileData.relPath))
+                filePath)
                 .message.getText()).toMatch(/Issue #\d+ created./);
 
         expect(IndividualIssuePage.statusValue.getText()).toBe(newIssueData.newIssue.status);
         expect(IndividualIssuePage.priorityValue.getText()).toBe(newIssueData.newIssue.priority);
         expect(IndividualIssuePage.assigneeLink.getText()).toBe(regDefaults.registerData.firstName + epoch.toString()
             + " " + regDefaults.registerData.lastName + epoch.toString());
-        expect(IndividualIssuePage.attachementLink.getText()).toBe(fileData.fileData.fileName);
+        expect(IndividualIssuePage.attachementLink.getText()).toBe(fileName);
 
     });
     it('should add file to project', function () {
@@ -139,8 +141,8 @@ describe('redmine demo test suite', function () {
                 .findProjectAndOpen(projectData.projectData.name + epoch.toString())
                 .openFilesTab()
                 .openAddNewFilePage()
-                .addNewFile(path.resolve(__dirname, fileData.fileData.relPath))
-                .lookUpFileByName(fileData.fileData.fileName).isPresent())
+                .addNewFile(filePath)
+                .lookUpFileByName(fileName).isPresent())
             .toBeTruthy();
 
     });
@@ -149,12 +151,12 @@ describe('redmine demo test suite', function () {
         RootPage
             .openProjects()
             .findProjectAndOpen(projectData.projectData.name + epoch.toString())
-            .openFilesTab().lookUpFileByName(fileData.fileData.fileName).isPresent()
+            .openFilesTab().lookUpFileByName(fileName).isPresent()
             .then(function (result) {
                 if (result) {
                     browser.wait(protractor.ExpectedConditions.invisibilityOf(FilesPage
-                            .removeFileByName(fileData.fileData.fileName)
-                            .lookUpFileByName(fileData.fileData.fileName))
+                            .removeFileByName(fileName)
+                            .lookUpFileByName(fileName))
                         , browser.params.baseTimeout);
                 }
                 else {

@@ -2,7 +2,7 @@ var AllureReporter = require('jasmine-allure-reporter');
 
 
 exports.config = {
-    seleniumAddress: 'http://localhost:4444/wd/hub',
+    seleniumAddress: 'http://192.168.99.100:31046/wd/hub',
     specs: ['specs/test.js'],
     multiCapabilities: [
         {
@@ -17,13 +17,13 @@ exports.config = {
                 }
             }
         }
-        ,
-        {
-            'browserName': 'firefox',
-            'moz:firefoxOptions': {
-                'args': ['--safe-mode']
-            }
-        }
+        /* ,
+         {
+             'browserName': 'firefox',
+             'moz:firefoxOptions': {
+                 'args': ['--safe-mode']
+             }
+         }*/
 
 
     ],
@@ -53,6 +53,9 @@ exports.config = {
     },
     params: {
         baseURL: 'http://demo.redmine.org/',
-        baseTimeout: 5000
+        baseTimeout: 50000,
+        dockerMode: true,
+
+
     }
 };
